@@ -1,10 +1,11 @@
 version: '3'
 services:
   mediawiki:
+    build: . 
     image: mediawiki
-    restart: always
+    #    restart: always
     ports:
-      - 80:80
+      - 20080:80
 #    links:
 #      - database
     volumes:
@@ -12,27 +13,30 @@ services:
       # After initial setup, download LocalSettings.php to the same directory as
       # this yaml and uncomment the following line and use compose to restart
       # the mediawiki service
-      - /c/docker/mirrors/mediawiki3/html:/var/www/html
+      - /c/docker/mirrors/mediawiki3/html/LocalSettings.php:/var/www/html/LocalSettings.php
     networks:
       dmz:
-        ipv4_address: 172.16.1.2
+        ipv4_address: 172.16.2.2
   database:
-    image: mariadb
-    restart: always
+    #build: mariadb/. 
+    image: mysql
+    #    restart: always
     environment:
       # @see https://phabricator.wikimedia.org/source/mediawiki/browse/master/includes/DefaultSettings.php
       - MYSQL_DATABASE=my_wiki
       - MYSQL_USER=wikiuser
-      - MYSQL_PASSWORD=example
+      - MYSQL_PASSWORD=jouda
       - MYSQL_ROOT_PASSWORD=toor
     volumes:
     - /c/docker/mirrors/mediawiki3/db:/var/lib/mysql
+    ports:
+    - "13306:3306"
     networks:
       dmz:
-        ipv4_address: 172.16.1.253
+        ipv4_address: 172.16.2.253
 networks:
   dmz:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.16.1.0/24
+        - subnet: 172.16.2.0/24
